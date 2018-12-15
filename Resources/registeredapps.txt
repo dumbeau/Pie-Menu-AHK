@@ -1,4 +1,0 @@
-1Default Pie Menu.exe
-1notepad.exe
-1chrome.exe
-1Photoshop.exe
