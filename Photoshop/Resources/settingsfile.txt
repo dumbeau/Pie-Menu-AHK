@@ -1,95 +1,95 @@
 `
-23
+59
 3
 2
 1
 
 1
-8
-I did a thing
-^r
-23
-get tool
-+^!k
-28
+1
+
+
+2
+photoshop
+p
+1
+
+
+1
+
+
+1
+
+
+1
+
+
+1
+
+
+1
+
+
+1
+
+
+1
+
+
+1
+
+
+1
+
+
+1
+
+
+1
+
+
+1
 
 
 13
 
 
-2
-Undo
-^!z
+7
+
+
 9
 
 
 15
 
 
-5
+13
 
 
-17
+8
 
 
-25
 
 
-11
 
 
-2
-Redo
-+^z
-27
 
 
-26
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 1
-
-
-20
-New Layer
-+^n
-29
-Text Tool
-t
-12
-Key Shortcuts
-+^!k
-24
-Crop Tool
-c
-30
-Dodge/Burn/Sponge
-o
-29
-Text Tool
-t
-C:\Users\Beau\Documents\AutoHotKey Scripts\Adobe\PieMenus\PhotoshopPieMenu\PieMenuSettings.ahk
-C:\Users\Beau\Documents\AutoHotKey Scripts\Adobe\PieMenus\PhotoshopPieMenu\get Tool.exe
-
-
-C:\Users\Beau\Documents\AutoHotKey Scripts\Adobe\PieMenus\PhotoshopPieMenu\get tool again.exe
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-2
 0000
 0000
 0000

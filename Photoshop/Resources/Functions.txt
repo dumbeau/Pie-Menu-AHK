@@ -1,42 +1,34 @@
-01No Action:What I'm getting ;)
+01No Action:Does nothing.
 02SendKey:Setup a hotkey with the fields to the right.
 03Run Program:Select a program to run.
 04Left Click:Left click with modifier keys in the location the pie menu was opened, or left click and drag with modifier on next LMB or pen press.
 05Right Click:Right click with modifier keys in the location the pie menu was opened, or right click and drag with modifier on next LMB or pen press.
 06Middle Click:Middle click with modifier keys in the location the pie menu was opened, or middle click and drag with modifier on next LMB or pen press.
-07Pie Menu Settings:Open settings for the pie menu
-08B/E Toggle:Goes to Brush tool, and then toggles between brush and eraser.
-09Brush Size:Change the Brush Size of current tool.
-10Bucket/Gradient:Selects bucket tool, if selected again this selects the Gradient Tool.
-11Delete Key:What do you think this does. (In all fairness you can't put the Delete key in the SendKey function).
-12Deselect:Sends Ctrl+D to deselect.
-13Enter Key:I have a six year degree in telling you that this function presses the Enter key.  Please read my thesis.
-14Eyedropper:Selects the Eyedropper tool
-15Fast Eyedropper:Uses the Eyedropper Tool on the position the pie menu was activated and reverts to the previous tool.
-16Fill:Fills with the Bucket Tool on the position the pie menu was activated and reverts to the previous tool.
-17LassoS Move:Lasso Select and Move after selection, pie key confirms transform and deselects selection.  Pressing the pie key after selecting the function cancels 'move after selection'.
-18Right Click:Right Click in the location the pie menu was activated.
-19Marquee:Just the boring Rectangle Marquee tool, you should really try the RectS Move and LassoS Move functions casuse they're real neat!
-20Move Tool:Selects the Move Tool
-21Right ClickPS:Right Clicks and lets you exit an opened menu by pressing the 'pie key'.
-22Pen/Curve:Selects Pen tool and if function is activated again the Curvature Pen Tool is activated.
-23RectS Move:Rectangle Select and Move after selection, pie key confirms transform and deselects selection.  Pressing the pie key after selecting the function cancels 'move after selection'.
-24Stamp Tool:Selects Stamp Tool and selecting this function again sends and Alt+LMB click to sample pixel area.
-25Rotate View:Rotate View tool, resets document rotation to 0° when function is selected again.
-26Color Select:Given the current tool responds to selected color, select a forground color.  Sends Shift+Alt+RMB to open menu.  Press and Release Pie Key to select color.
-27Opacity Select:Given the current tool has an Opacity setting, this allows Opacity selection.  Also works for tools with Tolerance, Strength, Exposure or Flow. (But that's our secret)
-28Hand/Zoom Tool:Selects Hand Tool, if selected again the Zoom tool is selected.
-29Zoom then Hand:First selects the Hand Tool, switches to the Zoom Tool when the 'Pie Key' is pressed and released, then switches back to the previous tool.
-30Change Active Brush:Change what tool the B/E Toggle function goes to, also switches to the selected tool.
+07Pie Menu Settings:Open the Pie Menu Settings for this program.  Ctrl + Alt + 'Pie Key' also opens the settings.
+08Close All Scripts:Closes all AutoHotkey scripts and Pie Menu apps.  Ctrl + Shift + Alt + 'Pie Key' also does this.
+09Minimize Window:Minimizes the active window
+10Enter Key:Sends the 'Enter Key" because it doesn't work in the send key function.
+12Delete Key:Sends the 'Delete Key', because 'Delete' also doesn't work in the sendkey function and I'm bad at programming.
+13Snip Tool:Sends Shift+Alt+Windows Key to activate the Screen Snip tool.  The image can be pasted from the clipboard (Ctrl + V)
+14Switch Application:Sends Windows Key + Tab to activate the Windows Task view.
+15Close Window:Closes the active window.
+16Resize Window: Moves the bottom left corner of the active window to the location the Pie Menu was opened.
 
 EndofList
 
 
 
 
-To Add a new Function, add the 2-digit list number, the name of the function label in the script ("_" should be spaces in this document), add a ":" and then a description of the function.  Make sure to leave blank lines between your last function and this comment.
-The Function labels shown here correspond to the label to the functions of the script, if the names are changed, their corresponding function label must be changed in the PieMenu.ahk script file.
+To Add a new Function, add the 2-digit list number, the name of the function label in the script ("_" should be spaces in this document), add a ":" and then a description of the function.  Don't touch the EndofList text and leave a line break between that and your functions.  The Function labels shown here correspond to the label to the functions of the script, if the names are changed, their corresponding function label must be changed in the PieMenu.ahk script file.
 Example:
 
 ...
 21Your Neat Function:Does all the cool stuff you programmed in the Your_Neat_Function label in the PieMenu.ahk file.
+
+"In the Pie Menu.ahk script"
+Your_Neat_Function:
+	{
+	BlockLButton := 0
+	;More function code
+	Return
+	}

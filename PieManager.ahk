@@ -14,7 +14,6 @@ Sysget, Mon6, Monitor, 6
 BitmapScreenRight := Max(Mon1Right, Mon2Right, Mon3Right, Mon4Right, Mon5Right, Mon6Right)
 BitmapScreenBottom := Max(Mon1Bottom, Mon2Bottom, Mon3Bottom, Mon4Bottom, Mon5Bottom, Mon6Bottom)
 
-
 SetUpGDIP()
 ShowToolTips := 1
 DefPieRunning := 0
@@ -43,6 +42,7 @@ WinGet, ActiveProcess, ProcessName, A
 Goto, FirstRunCheck
 
 RestartLabel:
+
 DetectHiddenWindows, On 
 
 OtherApp := ""
@@ -53,9 +53,23 @@ fullScriptPath := ""
 
 Loop  ;Will run while Default is running
 	{
+	If GetKeyState("Alt","P")
+		{
+		sleep, 50
+		continue
+		}
+	; If GetKeyState("g","P")
+		; {
+		; msgbox, %ActiveProcess% and previoous is %PrevActiveProcess%
+		; continue
+		; }	
+	If (A_Index > 10)
 	WinGet, ActiveProcess, ProcessName, A
 	If !ActiveProcess
+		{
+		sleep, 50
 		Continue
+		}
 	If PrevActiveProcess is not space
 		{
 		If (ActiveProcess != PrevActiveProcess) && (A_Index > 1) 
@@ -63,7 +77,15 @@ Loop  ;Will run while Default is running
 		}
 	If !PrevActiveProcess 
 		PrevActiveProcess := ActiveProcess
-
+	If (DefPieRunning = 1) && (A_Index < 25)
+		{
+		If (ActiveProcess != "EXPLORER.EXE") && (ActiveProcess != "explorer.exe")
+			{
+			Break
+			}
+		}
+	
+		
 
 	sleep, 10
 	If A_Index = 75
@@ -104,7 +126,7 @@ If ActiveProcess in %RegisteredAppList%
 	{
 	ProcessToKill := SubStr(ActiveProcess, 1, -4)
 	Run, "%A_ScriptDir%\%ProcessToKill%\PieMenu.ahk"	
-	
+	; sleep, %progwait%
 	If PieKeyTipShow = 1
 	{
 	FileReadline, piekeysetting, %A_ScriptDir%\%ProcessToKill%\Resources\settingsfile.txt, 1
@@ -127,8 +149,8 @@ Else
 	{
 	If (DefPieActive = 1) && (DefPieRunning = 0)
 		{
-		
 		Run, "%A_ScriptDir%\Default Pie Menu\PieMenu.ahk"
+		
 		DefPieRunning := 1
 		If PieKeyTipShow = 1
 			{

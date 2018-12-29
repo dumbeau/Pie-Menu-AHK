@@ -44,6 +44,7 @@ SetUpGDIP(iWidth=-1, iHeight=-1) {
 	return
 }
 
+
 StartDrawGDIP() {
 	global
 	

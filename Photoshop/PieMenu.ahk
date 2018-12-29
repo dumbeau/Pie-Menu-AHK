@@ -227,14 +227,6 @@ MethodtoShift := RPieSelectNum
 	If PieNumberSetting = 1
 		MethodtoShiftText :=  "You're only using ONE MENU!?? laaaaaaame... Go to PieMenuSettings.ahk to change this."
 
-;This is just a useful little addon that makes the Middle Mouse Button Pan your document.
-FileReadline, MMBPansetting, %A_ScriptDir%\Resources\settingsfile.txt, 6
-
-If piekeysetting != MButton
-	MButtonPanning := MMBPansetting
-Else 
-	MButtonPanning := 0		
-		
 ;Pie Menu Size Setting
 FileReadLine, PieMenuSizeTemp,%A_ScriptDir%\Resources\settingsfile.txt,92
 If PieMenuSizeTemp = 1
@@ -359,10 +351,9 @@ ShowToolTips := DisplayTooltipssetting
 
 
 ;Initialize variables
-PressEnter := False
-PressDeselect := 0
 BlockLButton := 0
-ActiveBrush := "paintbrushTool"	
+SetUpGDIP(BitmapScreenRight,BitmapScreenBottom)
+Gdip_FontFamilyCreate(Arial)
 
 ;Replaces spaces in labels with Underscores to link to function labels
 
@@ -889,9 +880,7 @@ fR6_Label = %R6_Label%
 	If R6_FuncLabel in Left_Click,Right_Click,Middle_Click
 		FileReadLine, R6_ClickMods, %A_ScriptDir%\Resources\settingsfile.txt,113			
 
-
-SetUpGDIP()
-		
+	
 ; FileReadLine, ActiveWindowClass, %A_ScriptDir%\Resources\WindowClassName.txt,1
 UsePieActivateKey = $*%PieActivateKey%
 UsePieDeactivateKey = $*%PieActivateKey% up
@@ -916,8 +905,6 @@ DllCall("FreeLibrary", UInt, hwintab32)
 return
 	}
 
-	
-	
 TABLETPACKET(wParam, lParam)
 {
 	global
@@ -988,7 +975,6 @@ PieActivate:
 	{
 	BlockLButton := 1
 	PieMode := 0
-
 	If GetKeyState("Alt", "P") && GetKeyState("Shift", "P") && GetKeyState("Control", "P")
 		{
 		Run "%A_ScriptDir%\CloseAllAhkScripts.ahk"
@@ -999,24 +985,10 @@ PieActivate:
 		Run "%A_ScriptDir%\PieMenuSettings.ahk" Restart
 		Exitapp
 		}
-	If SendAltUp = 1
-		{
-		send, {Alt Up}
-		SendAltUp := 0
-		}
-	If PressEnter = 1
-		{
-		send, {enter}
-		PressEnter := False
-		}
-	If PressDeselect = 1
-		{
-		send, ^d
-		PressDeselect := 0
-		}
-	
-	pie_pressed := "D"
 
+	pie_pressed := "D"
+	
+	
 	StartDrawGDIP()
 	ClearDrawGDIP()	
 	Gdip_SetSmoothingMode(G, 4)
@@ -1032,7 +1004,6 @@ PieActivate:
 		;Add Intermediate Points
 		If  A_Index > 1
 			distm := Sqrt(((( MXf + MXt ) / 2) - MXi)**2 + ((( MYf + MYt ) / 2) - MYi)**2)
-		
 		
 		;Previous Frame Set
 		MXt := MXf
@@ -1056,7 +1027,7 @@ PieActivate:
 				angle := 180			
 			}
 
-		
+
 		If GetKeyState("Alt", "P")
 			PieMode := 0
 		If GetKeyState("Shift", "P") &&  (PieNumberSetting > 1)
@@ -1830,7 +1801,7 @@ PieActivate:
 			Send, %ModsUp%
 			pie_pressed := "U"
 			ModsDown := ""
-			ModsUp := ""			
+			ModsUp := ""
 			StartDrawGDIP()
 			ClearDrawGDIP()
 			EndDrawGDIP()
@@ -1846,6 +1817,9 @@ PieActivate:
 			ModsDown := ""
 			ModsUp := ""
 			pie_pressed := "U"
+			StartDrawGDIP()
+			ClearDrawGDIP()
+			EndDrawGDIP()
 			Return
 			}
 		}
@@ -1920,9 +1894,9 @@ PieActivate:
 					Goto, PieKillSwitch
 				}
 			Send, %ModsUp%
-			pie_pressed := "U"
 			ModsDown := ""
 			ModsUp := ""
+			pie_pressed := "U"
 			StartDrawGDIP()
 			ClearDrawGDIP()
 			EndDrawGDIP()
@@ -1938,6 +1912,9 @@ PieActivate:
 			ModsDown := ""
 			ModsUp := ""
 			pie_pressed := "U"
+			StartDrawGDIP()
+			ClearDrawGDIP()
+			EndDrawGDIP()
 			Return
 			}
 		}
@@ -2015,9 +1992,9 @@ PieActivate:
 					Goto, PieKillSwitch
 				}
 			Send, %ModsUp%
+			pie_pressed := "U"
 			ModsDown := ""
 			ModsUp := ""
-			pie_pressed := "U"
 			StartDrawGDIP()
 			ClearDrawGDIP()
 			EndDrawGDIP()
@@ -2030,9 +2007,9 @@ PieActivate:
 			MouseClick, Middle, MXi, MYi, ,0
 			Send, %ModsUp%
 			BlockInput, MouseMoveOff
-			pie_pressed := "U"
 			ModsDown := ""
 			ModsUp := ""
+			pie_pressed := "U"
 			Return
 			}
 		}
@@ -2044,7 +2021,6 @@ PieActivate:
 	Enter_Key:
 		{
 		send, {Enter}
-		PressEnter := 0
 		Return
 		}
 	Delete_Key:
@@ -2074,892 +2050,24 @@ PieActivate:
 		}
 	Snip_Tool:
 		{
-		Send, !+LWin
+		Send, {LWin Down}+s{LWin Up}
 		Return
 		}
-	B/E_Toggle:
-		;Selects Brush and Toggles Eraser when Repeated
+	Resize_Window:
 		{
-		appRef := ComObjActive( "Photoshop.Application" )
-	If (appRef.CurrentTool = ActiveBrush)
-		{
-		appRef := ComObjActive( "Photoshop.Application" )
-		appRef.CurrentTool := "eraserTool"
-		}
-	Else
-		{
-		appRef := ComObjActive( "Photoshop.Application" )
-		appRef.CurrentTool := ActiveBrush
-		}
-		BlockLButton := 0
+		WinGetTitle, WinTitle, A
+		WinGetPos, winX, winY, , , A
+		WinMove, %WinTitle%,,,, MXi - winX, MYi - winY
+		WinTitle := ""
+		winX := ""
+		winY := ""
 		Return
 		}
-	Change_Active_Brush:
-		{
-		BlockRButton := 1
-		pie_pressed := "D"
-		
-		SetUpGDIP(BitmapScreenRight,BitmapScreenBottom)
-		StartDrawGDIP()
-		ClearDrawGDIP()	
-		Gdip_SetSmoothingMode(G, 4)
-		
-		Loop
-			{
-			MouseGetPos, MXf, MYf
-			;Calculate Distance
-			dist := Sqrt((MXf - MXi)**2 + (MYf - MYi)**2)
-			;Calculate Angle
-			YN := 0
-			If (MYf - MYi) > 0
-				YN := 180
-			If (MYf - MYi) != 0
-				angle := (ATan( (-1 / ((MYf - MYi) / (MXf - MXi)))) * -57.29578) + YN + 90
-			Else 
-				{			
-				If (MXf > MXi)
-					angle := 0
-				Else
-					angle := 180			
-				}
-			If (dist < 30)
-				{
-				pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\BrushSelect\SelM.png")
-				Goto, BrushPie
-				}
-			If angle between 0 and 60
-				{
-				pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\BrushSelect\Sel1.png")
-				Goto, BrushPie
-				}
-			If angle between 60 and 120
-				{
-				pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\BrushSelect\Sel2.png")
-				Goto, BrushPie
-				}
-			If angle between 120 and 180
-				{
-				pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\BrushSelect\Sel3.png")
-				Goto, BrushPie
-				}
-			If angle between 180 and 240
-				{
-				pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\BrushSelect\Sel4.png")
-				Goto, BrushPie
-				}
-			If angle between 240 and 300
-				{
-				pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\BrushSelect\Sel5.png")
-				Goto, BrushPie
-				}
-			If angle between 300 and 360
-				{
-				pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\BrushSelect\Sel6.png")
-				Goto, BrushPie
-				}
-			BrushPie:
-			Gdip_DrawImage(G, pBitmap, MXi-60, MYi-60, 119, 119)
-			Gdip_DisposeImage(pBitmap)
-			
-			EndDrawGDIP()
-			StartDrawGDIP()
-			
-			If pie_pressed != D
-				{
-				MouseGetPos, MXf, MYf
-					dist := Sqrt((MXf - MXi)**2 + (MYf - MYi)**2)
-		
-					YN := 0
-					If (MYf - MYi) > 0
-						YN := 180
-					If (MYf - MYi) != 0
-						angle := (ATan( (-1 / ((MYf - MYi) / (MXf - MXi)))) * -57.29578) + YN + 90
-					Else
-						{
-						If (MXf - MXi) > 0
-							angle := 0
-						Else
-							angle := 180			
-						}
-				Break
-				}
-			 sleep, 20
-			}
-		ClearDrawGDIP()
-		EndDrawGDIP()
-		If (dist < 30)
-			{
-			appRef := ComObjActive( "Photoshop.Application" )
-			ActiveBrush := "paintbrushTool"
-			appRef.CurrentTool := ActiveBrush
-			BlockLButton := 0
-			BlockRButton := 0
-			Return
-			}
-		If angle between 0 and 60
-			{
-			appRef := ComObjActive( "Photoshop.Application" )
-			ActiveBrush := "colorReplacementBrushTool"
-			appRef.CurrentTool := ActiveBrush
-			BlockLButton := 0
-			BlockRButton := 0
-			Return
-			}
-		If angle between 60 and 120
-			{
-			appRef := ComObjActive( "Photoshop.Application" )
-			ActiveBrush := "wetBrushTool"
-			appRef.CurrentTool := ActiveBrush
-			BlockLButton := 0
-			BlockRButton := 0
-			Return
-			}
-		If angle between 120 and 180
-			{
-			appRef := ComObjActive( "Photoshop.Application" )
-			ActiveBrush := "smudgeTool"
-			appRef.CurrentTool := ActiveBrush
-			BlockLButton := 0
-			BlockRButton := 0
-			Return
-			}
-		If angle between 180 and 240
-			{
-			appRef := ComObjActive( "Photoshop.Application" )
-			ActiveBrush := "historyBrushTool"
-			appRef.CurrentTool := ActiveBrush
-			BlockLButton := 0
-			BlockRButton := 0
-			Return
-			}
-		If angle between 240 and 300
-			{
-			appRef := ComObjActive( "Photoshop.Application" )
-			ActiveBrush := "artBrushTool"
-			appRef.CurrentTool := ActiveBrush
-			BlockLButton := 0
-			BlockRButton := 0
-			Return
-			}
-		If angle between 300 and 360
-			{
-			appRef := ComObjActive( "Photoshop.Application" )
-			ActiveBrush := "pencilTool"
-			appRef.CurrentTool := ActiveBrush
-			BlockLButton := 0
-			BlockRButton := 0
-			Return
-			}
-		BlockLButton := 0
-		BlockRButton := 0
-		Return
-		}
-	RectS_Move:
-		{
-		;Rect Marquee and Move Selection, click Pie Activate button to cancel selection.
-		;To confirm and deselect the selection, you can click the Pie activation key again.
-		If ShowToolTips = 1
-			{
-			StartDrawGDIP()
-			ClearDrawGDIP()	
-			
-			Gdip_SetSmoothingMode(G, 4)
-			
-			TXo := A_ScreenWidth / 2
-			TYo := A_ScreenHeight - 100
-			textoptions = x%TXo% y%TYo% Center Vcenter cffF6F653 r4 s16
-			Gdip_TextToGraphics(G, "Press and Release 'Pie Key' to cancel 'move after selection'", textoptions)
-			EndDrawGDIP()
-			}
-		
-		pie_pressed := "D"
-		BlockLButton := 0
-		appRef := ComObjActive( "Photoshop.Application" )
-		appRef.CurrentTool := "marqueeRectTool"
-		loop
-			{
-			Sleep, 15
-			if tabletPressure > 0
-				Goto, PSPenSelectLoop
-			if GetKeyState("LButton", "P")
-				Goto, PSMouseSelectLoop	
-			if GetKeyState("RButton", "P")
-				Goto, PieKillSwitch	
-			if pie_pressed = U
-				Goto, PieKillSwitch
-			}
-		}
-	LassoS_Move:
-		{
-		;Lasso and Move Selection, click Pie Activate button to cancel selection.  
-		;To confirm and deselect the selection, you can click the Pie activation key again.
-		
-		If ShowToolTips = 1
-			{
-			StartDrawGDIP()
-			ClearDrawGDIP()	
-			
-			Gdip_SetSmoothingMode(G, 4)
-			
-			TXo := A_ScreenWidth / 2
-			TYo := A_ScreenHeight - 100
-			textoptions = x%TXo% y%TYo% Center Vcenter cffF6F653 r4 s16
-			Gdip_TextToGraphics(G, "Press and Release 'Pie Key' to cancel 'move after selection'", textoptions)
-			EndDrawGDIP()
-			}
-		
-		pie_pressed := "D"
-		BlockLButton := 0
-		appRef := ComObjActive( "Photoshop.Application" )
-		appRef.CurrentTool := "lassoTool"
-		loop
-			{
-			Sleep, 15
-			if tabletPressure > 0
-				Goto, PSPenSelectLoop
-			if GetKeyState("LButton", "P")
-				Goto, PSMouseSelectLoop	
-			if GetKeyState("RButton", "P")
-				Goto, PieKillSwitch	
-			if pie_pressed = U
-				Goto, PieKillSwitch	
-			}
-		
-		Return
-		}
-	Opacity_Select:
-		{
-		BlockRButton := 1
-		appRef := ComObjActive( "Photoshop.Application" )
-		CurrentTool := appRef.CurrentTool
-		If CurrentTool in magicWandTool,paintbrushTool,pencilTool,colorReplacementBrushTool,wetBrushTool,cloneStampTool,patternStampTool,historyBrushTool,artBrushTool,eraserTool,backgroundEraserTool,magicEraserTool,bucketTool,blurTool,sharpenTool,smudgeTool,dodgeTool,burnInTool,saturationTool
-			{
-			pie_pressed := "D"
-
-			SetUpGDIP(BitmapScreenRight,BitmapScreenBottom)
-			StartDrawGDIP()
-			ClearDrawGDIP()	
-			Gdip_SetSmoothingMode(G, 4)
-			
-			Loop
-				{
-				MouseGetPos, MXf, MYf
-				;Calculate Distance
-				dist := Sqrt((MXf - MXi)**2 + (MYf - MYi)**2)
-				;Calculate Angle
-				YN := 0
-				If (MYf - MYi) > 0
-					YN := 180
-				If (MYf - MYi) != 0
-					{
-					angle := (ATan( (-1 / ((MYf - MYi) / (MXf - MXi)))) * -57.29578) + YN + 90
-					}
-				Else  
-					{			
-					If (MXf > MXi)
-						angle := 0
-					Else
-						angle := 180			
-					}
-				If (dist < 35)
-					{
-					pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\NumberSelect\Sel10.png")
-					Goto NumberDrawPie
-					}
-				If angle between 50 and 90
-					{
-					pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\NumberSelect\Sel1.png")
-					Goto NumberDrawPie
-					}
-				If angle between 10 and 50
-					{
-					pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\NumberSelect\Sel2.png")
-					Goto NumberDrawPie
-					}
-				If angle between 290 and 330
-					{
-					pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\NumberSelect\Sel4.png")
-					Goto NumberDrawPie
-					}
-				If angle between 250 and 290
-					{
-					pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\NumberSelect\Sel5.png")
-					Goto NumberDrawPie
-					}
-				If angle between 210 and 250
-					{
-					pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\NumberSelect\Sel6.png")
-					Goto NumberDrawPie
-					}
-				If angle between 170 and 210
-					{
-					pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\NumberSelect\Sel7.png")
-					Goto NumberDrawPie
-					}
-				If angle between 130 and 170
-					{
-					pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\NumberSelect\Sel8.png")
-					Goto NumberDrawPie
-					}
-				If angle between 90 and 130
-					{
-					pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\NumberSelect\Sel9.png")
-					Goto NumberDrawPie
-					}
-				Else
-					{
-					pBitmap := Gdip_CreateBitmapFromFile(A_ScriptDir . "\Resources\NumberSelect\Sel3.png")
-					Goto NumberDrawPie
-					}
-				NumberDrawPie:
-				Gdip_DrawImage(G, pBitmap, MXi-60, MYi-60, 119, 119)
-				Gdip_DisposeImage(pBitmap)
-				
-				If ShowToolTips = 1
-					{
-					TXo := A_ScreenWidth / 2
-					TYo := A_ScreenHeight - 100
-					textoptions = x%TXo% y%TYo% Center Vcenter cffF6F653 r4 s16
-					If A_Index < 2
-						{
-						toolsettingtiptext := "Press and Release 'Pie Key' to select Opacity ( x10% )"
-						If CurrentTool in magicWandTool,colorReplacementBrushTool,backgroundEraserTool,magicEraserTool
-							toolsettingtiptext := "Press and Release 'Pie Key' to select Tolerance ( x10% )"
-						If CurrentTool in blurTool,sharpenTool,smudgeTool
-							toolsettingtiptext := "Press and Release 'Pie Key' to select Strength ( x10% )"
-						If CurrentTool in dodgeTool,burnInTool
-							toolsettingtiptext := "Press and Release 'Pie Key' to select Exposure ( x10% )"	
-						If CurrentTool in saturationTool
-							toolsettingtiptext := "Press and Release 'Pie Key' to select Flow ( x10% )"	
-						}
-					Gdip_TextToGraphics(G, toolsettingtiptext, textoptions)
-					}
-				EndDrawGDIP()
-				StartDrawGDIP()
-				
-				If pie_pressed != D
-					{
-					MouseGetPos, MXf, MYf
-						dist := Sqrt((MXf - MXi)**2 + (MYf - MYi)**2)
-			
-						YN := 0
-						If (MYf - MYi) > 0
-							YN := 180
-						If (MYf - MYi) != 0
-							angle := (ATan( (-1 / ((MYf - MYi) / (MXf - MXi)))) * -57.29578) + YN + 90
-						Else
-							{
-							If (MXf - MXi) > 0
-								angle := 0
-							Else
-								angle := 180			
-							}
-					Break
-					}
-				 sleep, 20
-				}
-			ClearDrawGDIP()
-			EndDrawGDIP()
-			If (dist < 35)
-				{
-				send, {Enter}1{Enter}{Enter}100{Enter}
-				BlockLButton := 0
-				BlockRButton := 0
-				Return
-				}
-			If angle between 50 and 90
-				{
-				send, {Enter}1{Enter}{Enter}10{Enter}
-				BlockLButton := 0
-				BlockRButton := 0
-				Return
-				}
-			If angle between 10 and 50
-				{
-				send, {Enter}1{Enter}{Enter}20{Enter}
-				BlockLButton := 0
-				BlockRButton := 0
-				Return
-				}
-			If angle between 290 and 330
-				{
-				send, {Enter}1{Enter}{Enter}40{Enter}
-				BlockLButton := 0
-				BlockRButton := 0
-				Return
-				}
-			If angle between 250 and 290
-				{
-				send, {Enter}1{Enter}{Enter}50{Enter}
-				BlockLButton := 0
-				BlockRButton := 0
-				Return
-				}
-			If angle between 210 and 250
-				{
-				send, {Enter}1{Enter}{Enter}60{Enter}
-				BlockLButton := 0
-				BlockRButton := 0
-				Return
-				}
-			If angle between 170 and 210
-				{
-				send, {Enter}1{Enter}{Enter}70{Enter}
-				BlockLButton := 0
-				BlockRButton := 0
-				Return
-				}
-			If angle between 130 and 170
-				{
-				send, {Enter}1{Enter}{Enter}80{Enter}
-				BlockLButton := 0
-				BlockRButton := 0
-				Return
-				}
-			If angle between 90 and 130
-				{
-				send, {Enter}1{Enter}{Enter}90{Enter}
-				BlockLButton := 0
-				BlockRButton := 0
-				Return
-				}
-			Else
-				{
-				send
-				, {Enter}1{Enter}{Enter}30{Enter}
-				BlockLButton := 0
-				BlockRButton := 0
-				Return
-				}
-			}
-		BlockLButton := 0
-		BlockRButton := 0
-		Return
-		}
-	Color_Select:
-		{
-		BlockRButton := 1
-		appRef := ComObjActive( "Photoshop.Application" )
-		CurrentTool := appRef.CurrentTool
-		If	CurrentTool in eyeDropperTool,3DMaterialSelectTool,colorSamplerTool,rulerTool,textAnnoteTool,countTool,spotHealingBrushTool,magicStampTool,redEyeTool,paintbrushTool,pencilTool,colorReplacementBrushTool,wetBrushTool,cloneStampTool,patternStampTool,historyBrushTool,artBrushTool,eraserTool,backgroundEraserTool,magicEraserTool,gradientTool,bucketTool,3DMaterialDropTool,blurTool,sharpenTool,smudgeTool,dodgeTool,burnInTool,saturationTool,penTool,freeformPenTool,curvaturePenTool,addKnotTool,deleteKnotTool,convertKnotTool,typeCreateOrEditTool,typeVerticalCreateOrEditTool,typeVerticalCreateMaskTool,typeCreateMaskTool,pathComponentSelectTool,directSelectTool,rectangleTool,roundedRectangleTool,ellipseTool,polygonTool,lineTool,customShapeTool,handTool,rotateTool,zoomTool
-			{
-			If ShowToolTips = 1
-				{
-				StartDrawGDIP()
-				ClearDrawGDIP()	
-				
-				Gdip_SetSmoothingMode(G, 4)
-				
-				TXo := A_ScreenWidth / 2
-				TYo := A_ScreenHeight - 100
-				textoptions = x%TXo% y%TYo% Center Vcenter cffF6F653 r4 s16
-				Gdip_TextToGraphics(G, "Press and Release 'Pie Key' to select Color", textoptions)
-				EndDrawGDIP()
-				}
-			Send, {Alt Down}{Shift Down}{RButton Down}
-			Send, {Alt Up}{Shift Up}
-			pie_pressed = "D"
-			loop
-				{
-				sleep, 20
-				If pie_pressed = U
-					Break
-				}
-			Send, {RButton Up}
-			}
-		StartDrawGDIP()
-		ClearDrawGDIP()	
-		EndDrawGDIP()
-		BlockLButton := 0
-		BlockRButton := 0
-		Return
-		}
-	Brush_Size:
-		{
-		;Select Brush Size and Hardness
-		BlockRButton := 1
-	
-		appRef := ComObjActive( "Photoshop.Application" )
-		CurrentTool := appRef.CurrentTool
-		
-		If  CurrentTool in quickSelectTool,spotHealingBrushTool,magicStampTool,paintbrushTool,pencilTool,colorReplacementBrushTool,wetBrushTool,cloneStampTool,patternStampTool,historyBrushTool,artBrushTool,eraserTool,backgroundEraserTool,blurTool,sharpenTool,smudgeTool,dodgeTool,burnInTool,saturationTool
-			{
-			If ShowToolTips = 1
-				{
-				StartDrawGDIP()
-				ClearDrawGDIP()	
-				
-				Gdip_SetSmoothingMode(G, 4)
-				
-				TXo := A_ScreenWidth / 2
-				TYo := A_ScreenHeight - 100
-				textoptions = x%TXo% y%TYo% Center Vcenter cffF6F653 r4 s16
-				Gdip_TextToGraphics(G, "Press and Release 'Pie Key' to select size", textoptions)
-				EndDrawGDIP()
-				}
-			send, {LAlt Down}{RButton Down}
-			send, {LAlt Up}
-			pie_pressed = "D"
-			loop
-				{
-				sleep, 6
-				If pie_pressed = U
-					Break
-				If GetKeyState("LButton", "P")
-					Break
-				}
-			send, {RButton Up}
-			BlockLButton := 0
-			BlockRButton := 0
-			}
-		StartDrawGDIP()
-		ClearDrawGDIP()	
-		EndDrawGDIP()
-		Return
-		
-		
-		}
-	Zoom_then_Hand:
-		{
-		BlockLButton := 0
-		appRef := ComObjActive( "Photoshop.Application" )
-		PrevTool = % appRef.CurrentTool
-		appRef.CurrentTool := "zoomTool"
-		If ShowToolTips = 1
-				{
-				StartDrawGDIP()
-				ClearDrawGDIP()	
-				
-				Gdip_SetSmoothingMode(G, 4)
-				
-				TXo := A_ScreenWidth / 2
-				TYo := A_ScreenHeight - 100
-				textoptions = x%TXo% y%TYo% Center Vcenter cffF6F653 r4 s16
-				Gdip_TextToGraphics(G, "'Pie Key' to go to Hand Tool", textoptions)
-				EndDrawGDIP()
-				}
-		pie_pressed = "D"
-			loop
-				{
-				sleep, 6
-				If pie_pressed = U
-					Break
-				}
-		appRef.CurrentTool := "handTool"
-		If ShowToolTips = 1
-				{
-				StartDrawGDIP()
-				ClearDrawGDIP()	
-				
-				Gdip_SetSmoothingMode(G, 4)
-				
-				TXo := A_ScreenWidth / 2
-				TYo := A_ScreenHeight - 100
-				textoptions = x%TXo% y%TYo% Center Vcenter cffF6F653 r4 s16
-				Gdip_TextToGraphics(G, "'Pie Key' to confirm View and return to previous tool", textoptions)
-				EndDrawGDIP()
-				}
-		pie_pressed = "D"
-			loop
-				{
-				sleep, 6
-				If pie_pressed = U
-					Break
-				}
-		StartDrawGDIP()
-		ClearDrawGDIP()	
-		EndDrawGDIP()
-		appRef.CurrentTool := PrevTool
-		Return
-		}
-	Fast_Eyedropper:
-		{
-		;Eye Dropper in Pie Center location and go to Previous Tool
-		BlockLButton := 0
-		appRef := ComObjActive( "Photoshop.Application" )
-		PrevTool = % appRef.CurrentTool
-		appRef.CurrentTool := "eyedropperTool"
-		Mouseclick, Left, MXi, MYi, , 0
-		appRef.CurrentTool := PrevTool
-		Return
-		}
-	Fill:
-		{
-		;Fill with Bucket tool in Center of Pie
-		BlockLButton := 0
-		appRef := ComObjActive( "Photoshop.Application" )
-		PrevTool = % appRef.CurrentTool
-		appRef.CurrentTool := "bucketTool"
-		Mouseclick, left, MXi, MYi, , 0
-		appRef.CurrentTool := PrevTool
-		Return
-		}
-	Pen/Curve:
-		{
-		;Pen Tool Selection, Curvature Pen Tool on Repeat Selection
-		BlockLButton := 0
-		appRef := ComObjActive( "Photoshop.Application" )
-		If appRef.CurrentTool = "penTool"
-			appRef.CurrentTool := "curvaturePenTool"
-		Else
-		appRef.CurrentTool := "penTool"
-		Return
-		}
-	Hand/Zoom_Tool:
-		{
-		BlockLButton := 0
-		appRef := ComObjActive( "Photoshop.Application" )
-		If appRef.CurrentTool = "zoomTool"
-			{
-			appRef.CurrentTool := "handTool"
-			Return
-			}
-		Else
-		appRef.CurrentTool := "zoomTool"
-		Return
-		}
-	Rotate_View:
-		{
-		BlockLButton := 0
-		appRef := ComObjActive( "Photoshop.Application" )
-		If appRef.CurrentTool = "rotateTool"
-			{
-			Mouseclick, Left, MXi, MYi, , 0
-			send, {enter}0{enter}
-			Return
-			}
-		Else
-		appRef.CurrentTool := "rotateTool"
-		Return
-		}
-	Deselect:
-		{
-		;Why am I writing these tooltip comments?
-		BlockLButton := 0
-		send, ^d		
-		PressDeselect := 0
-		Return
-		}
-	
-	;Shift Red Pie Functions Rpsn is no direction and Rps1 is upper-right.  The rest go counter-clockwise from Rps1
-	Right_ClickPS:
-		{
-		;Left Click at Pie center
-		BlockLButton := 0
-		MouseClick, Right, MXi, MYi, , 0
-		WinGetClass, winclass, A
-		If winclass != Photoshop
-			{
-			If ShowToolTips = 1
-				{
-				StartDrawGDIP()
-				ClearDrawGDIP()	
-				
-				Gdip_SetSmoothingMode(G, 4)
-				
-				TXo := A_ScreenWidth / 2
-				TYo := A_ScreenHeight - 100
-				textoptions = x%TXo% y%TYo% Center Vcenter cffF6F653 r4 s16
-				Gdip_TextToGraphics(G, "Press 'Pie Key' to exit menu", textoptions)
-				EndDrawGDIP()
-				}
-			Hotkey, IfWinActive, ahk_class PSFloatC
-			Hotkey,%UsePieActivateKey%,RMBMenuDeactivate
-			Hotkey,%UsePieDeactivateKey%,ReleasePieKey
-			pie_pressed := "D"
-			loop
-				{
-				If pie_pressed = U
-					{
-					send, {enter}
-					StartDrawGDIP()
-					ClearDrawGDIP()
-					EndDrawGDIP()
-					Break
-					}
-				WinGetClass, winclass, A
-				If winclass = Photoshop
-					{
-					; msgbox, out of weird class
-					pie_pressed = "U"
-					StartDrawGDIP()
-					ClearDrawGDIP()
-					EndDrawGDIP()
-					Break
-					}
-				sleep, 20
-				}
-			Return
-			}
-		PressEnter := 1
-		Return
-		}
-	Marquee:
-		{
-		BlockLButton := 0
-		send, m
-		Return
-		}
-	Move_Tool:
-		{
-		;Move Tool
-		BlockLButton := 0
-		appRef := ComObjActive( "Photoshop.Application" )
-		If appRef.CurrentTool = "moveTool"
-			{
-			send, {Alt Down}
-			pie_pressed := "D"	
-			SendAltUp := 1
-			PressEnter := True
-			PressDeselect := 1
-			Return
-			}
-		appRef.CurrentTool := "moveTool"
-		PressEnter := True
-		Return
-		}
-	Bucket/Gradient:
-		{
-		;Bucket Tool, Gradient Tool on Repeated Selection
-		BlockLButton := 0
-		appRef := ComObjActive( "Photoshop.Application" )
-		If appRef.CurrentTool = "bucketTool"
-			appRef.CurrentTool := "gradientTool"
-		Else
-		appRef.CurrentTool := "bucketTool"
-		Return
-		}
-	Stamp_Tool:
-		{
-		;Stamp tool
-		BlockLButton := 0
-		appRef := ComObjActive( "Photoshop.Application" )
-		If appRef.CurrentTool = "cloneStampTool"
-			{
-			send, {AltDown}
-			MouseClick, Left, MXi, MYi, , 0
-			send, {AltUp}
-			}
-		Else
-			{
-			appRef.CurrentTool := "cloneStampTool"
-			If ShowToolTips = 1
-					{
-					StartDrawGDIP()
-					ClearDrawGDIP()	
-					
-					Gdip_SetSmoothingMode(G, 4)
-					
-					TXo := A_ScreenWidth / 2
-					TYo := A_ScreenHeight - 100
-					textoptions = x%TXo% y%TYo% Center Vcenter cffF6F653 r4 s16
-					Gdip_TextToGraphics(G, "Select Function again to Sample Area", textoptions)
-					EndDrawGDIP()
-					}
-			}
-		Return
-		}
-	Eyedropper:
-		{
-		;Eye Dropper to Previous Tool
-		BlockLButton := 0
-		
-		appRef := ComObjActive( "Photoshop.Application" )
-		PrevTool = % appRef.CurrentTool
-		appRef.CurrentTool := "eyedropperTool"
-		pie_pressed := "D"
-		loop
-			{
-			Sleep, 10
-			if tabletPressure > 0
-				Break
-			if GetKeyState("LButton", "P")
-				Break
-			if GetKeyState("RButton", "P")
-				Goto, PieKillSwitch
-			if pie_pressed = U
-				{
-				appRef.CurrentTool := PrevTool
-				Goto, PieKillSwitch
-				}
-			}
-		loop
-			{
-			
-			if tabletPressure = 0
-				Break
-			if !GetKeyState("LButton", "P")
-				Break
-			Sleep, 10
-			}
-		pie_pressed := "U"
-		appRef.CurrentTool := PrevTool
-		Return
-		}
-	Return	
-	
-	;Labels for common function references.  Don't Touch.
-		PSPenSelectLoop:
-		ClearDrawGDIP()
-		EndDrawGDIP()
-		loop
-			{
-			sleep 15
-			if tabletPressure = 0
-				{
-				PressDeselect := 1
-				Goto, SelectMoveTool
-				}
-			}
-		PSMouseSelectLoop:
-		ClearDrawGDIP()
-		EndDrawGDIP()
-		loop
-			{
-			sleep 15
-			if !GetKeyState("LButton", "P")
-				{
-				PressDeselect := 1
-				Goto, SelectMoveTool
-				}
-			}
-	SelectMoveTool:
-		sleep, 100
-		pie_pressed := "U"
-		appRef := ComObjActive( "Photoshop.Application" )
-		appRef.CurrentTool := "moveTool"
-		PressEnter := True
-		If ShowToolTips = 1
-			{
-			StartDrawGDIP()
-			ClearDrawGDIP()	
-			
-			Gdip_SetSmoothingMode(G, 4)
-			
-			TXo := A_ScreenWidth / 2
-			TYo := A_ScreenHeight - 100
-			textoptions = x%TXo% y%TYo% Center Vcenter cffF6F653 r4 s16
-			Gdip_TextToGraphics(G, "Press 'Pie Key' Confirm Transform and Deselect", textoptions)
-			EndDrawGDIP()
-			}		
 	}
 
-
-	
 ReleasePieKey:
 	pie_pressed := "U"
 Return
-
-#If MButtonPanning
-	{
-	MButton::
-		{
-		Send, {Space down}{LButton down}
-		KeyWait, MButton
-		Send, {LButton up}{Space up}
-		Return
-		}
-	}
 
 #If BlockRButton
 RButton::
@@ -2968,6 +2076,8 @@ Return
 #If BlockLButton
 LButton::
 Return
+
+
 
 RMBMenuDeactivate:
 {
