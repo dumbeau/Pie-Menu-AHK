@@ -77,9 +77,9 @@ Loop  ;Will run while Default is running
 		}
 	If !PrevActiveProcess 
 		PrevActiveProcess := ActiveProcess
-	If (DefPieRunning = 1) && (A_Index < 25)
+	If (DefPieRunning = 1) && (A_Index < 25) && (ActiveProcess != "EXPLORER.EXE") && (ActiveProcess != "explorer.exe")
 		{
-		If (ActiveProcess != "EXPLORER.EXE") && (ActiveProcess != "explorer.exe")
+		If ActiveProcess in %RegisteredAppList%
 			{
 			Break
 			}
@@ -171,4 +171,3 @@ Else
 		}
 	Goto, RestartLabel
 	}
-
