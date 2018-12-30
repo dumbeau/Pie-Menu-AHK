@@ -2,6 +2,7 @@
 #SingleInstance ignore
 #Include %A_ScriptDir%\Resources\GDIp_All.ahk
 #Include %A_ScriptDir%\Resources\GDIpHelper.ahk
+#InstallMouseHook
 CoordMode, Mouse, Screen
 	
 	
@@ -974,7 +975,6 @@ PieActivate:
 	{
 	BlockLButton := 1
 	PieMode := 0
-
 	If GetKeyState("Alt", "P") && GetKeyState("Shift", "P") && GetKeyState("Control", "P")
 		{
 		Run "%A_ScriptDir%\CloseAllAhkScripts.ahk"
@@ -985,12 +985,7 @@ PieActivate:
 		Run "%A_ScriptDir%\PieMenuSettings.ahk" Restart
 		Exitapp
 		}
-	If SendAltUp = 1
-		{
-		send, {Alt Up}
-		SendAltUp := 0
-		}
-	
+
 	pie_pressed := "D"
 	
 	
@@ -1009,9 +1004,6 @@ PieActivate:
 		;Add Intermediate Points
 		If  A_Index > 1
 			distm := Sqrt(((( MXf + MXt ) / 2) - MXi)**2 + ((( MYf + MYt ) / 2) - MYi)**2)
-		
-		
-		
 		
 		;Previous Frame Set
 		MXt := MXf
@@ -1045,9 +1037,11 @@ PieActivate:
 				
 		If PieMode = 0
 			{
-			pBackgroundRight = %A_ScriptDir%\Resources\LabelBG\BMenuRight.png
+			pBackgroundRightD = %A_ScriptDir%\Resources\LabelBG\BMenuRight.png
+			pBackgroundRightU = %A_ScriptDir%\Resources\LabelBG\BMenuRight.png
 			pBackgroundTop = %A_ScriptDir%\Resources\LabelBG\BMenuTop.png
-			pBackgroundLeft = %A_ScriptDir%\Resources\LabelBG\BMenuLeft.png
+			pBackgroundLeftD = %A_ScriptDir%\Resources\LabelBG\BMenuLeft.png
+			pBackgroundLeftU = %A_ScriptDir%\Resources\LabelBG\BMenuLeft.png
 			pBackgroundBottom = %A_ScriptDir%\Resources\LabelBG\BMenuBottom.png
 			If (dist < PieMenuSize)
 				{
@@ -1110,35 +1104,42 @@ PieActivate:
 				{
 				MiddleLeft := 1
 				}
-			If angle between 0 and 60 
+			If angle between 0 and 60 ;Bottom Right
 				{
+				pBackgroundLeftU = %A_ScriptDir%\Resources\LabelBG\BMenuLeftH.png
+				
 				pBitmap := Gdip_CreateBitmapFromFile(B1_Image)
 				Goto DrawPie
 				}
-			If angle between 60 and 120 ;Top
+			If angle between 60 and 120 ;Bottom
 				{
+				pBackgroundBottom = %A_ScriptDir%\Resources\LabelBG\BMenuBottomH.png
 				pBitmap := Gdip_CreateBitmapFromFile(B2_Image)
 				TopHovered := 1
 				Goto DrawPie
 				}
-			If angle between 120 and 180
+			If angle between 120 and 180 ;Bottom Left
 				{
+				pBackgroundRightU = %A_ScriptDir%\Resources\LabelBG\BMenuRightH.png
 				pBitmap := Gdip_CreateBitmapFromFile(B3_Image)
 				Goto DrawPie
 				}
-			If angle between 180 and 240
+			If angle between 180 and 240 ;Top Left
 				{
+				pBackgroundRightD = %A_ScriptDir%\Resources\LabelBG\BMenuRightH.png
 				pBitmap := Gdip_CreateBitmapFromFile(B4_Image)
 				Goto DrawPie
 				}
-			If angle between 240 and 300 ;Bottom
+			If angle between 240 and 300 ;Top
 				{
+				pBackgroundTop = %A_ScriptDir%\Resources\LabelBG\BMenuTopH.png
 				pBitmap := Gdip_CreateBitmapFromFile(B5_Image)
 				BottomHovered := 1
 				Goto DrawPie
 				}
-			If angle between 300 and 360
+			If angle between 300 and 360 ;Top Right
 				{
+				pBackgroundLeftD = %A_ScriptDir%\Resources\LabelBG\BMenuLeftH.png
 				pBitmap := Gdip_CreateBitmapFromFile(B6_Image)
 				Goto DrawPie
 				}
@@ -1146,9 +1147,11 @@ PieActivate:
 		PurplePie:
 		If PieMode = 1
 			{
-			pBackgroundRight = %A_ScriptDir%\Resources\LabelBG\PMenuRight.png
+			pBackgroundRightU = %A_ScriptDir%\Resources\LabelBG\PMenuRight.png
+			pBackgroundRightD = %A_ScriptDir%\Resources\LabelBG\PMenuRight.png
 			pBackgroundTop = %A_ScriptDir%\Resources\LabelBG\PMenuTop.png
-			pBackgroundLeft = %A_ScriptDir%\Resources\LabelBG\PMenuLeft.png
+			pBackgroundLeftU = %A_ScriptDir%\Resources\LabelBG\PMenuLeft.png
+			pBackgroundLeftD = %A_ScriptDir%\Resources\LabelBG\PMenuLeft.png
 			pBackgroundBottom = %A_ScriptDir%\Resources\LabelBG\PMenuBottom.png
 			If (dist < PieMenuSize)
 				{
@@ -1183,33 +1186,39 @@ PieActivate:
 				}
 			If angle between 0 and 60
 				{
+				pBackgroundLeftU = %A_ScriptDir%\Resources\LabelBG\PMenuLeftH.png
 				pBitmap := Gdip_CreateBitmapFromFile(P1_Image)
 				Goto DrawPie
 				}
 			If angle between 60 and 120
 				{
+				pBackgroundBottom = %A_ScriptDir%\Resources\LabelBG\PMenuBottomH.png
 				pBitmap := Gdip_CreateBitmapFromFile(P2_Image)
 				TopHovered := 1
 				Goto DrawPie
 				}
 			If angle between 120 and 180
 				{
+				pBackgroundRightU = %A_ScriptDir%\Resources\LabelBG\PMenuRightH.png
 				pBitmap := Gdip_CreateBitmapFromFile(P3_Image)
 				Goto DrawPie
 				}
 			If angle between 180 and 240
 				{
+				pBackgroundRightD = %A_ScriptDir%\Resources\LabelBG\PMenuRightH.png
 				pBitmap := Gdip_CreateBitmapFromFile(P4_Image)
 				Goto DrawPie
 				}
 			If angle between 240 and 300
 				{
+				pBackgroundTop = %A_ScriptDir%\Resources\LabelBG\PMenuTopH.png
 				pBitmap := Gdip_CreateBitmapFromFile(P5_Image)
 				BottomHovered := 1
 				Goto DrawPie
 				}
 			If angle between 300 and 360
 				{
+				pBackgroundLeftD = %A_ScriptDir%\Resources\LabelBG\PMenuLeftH.png
 				pBitmap := Gdip_CreateBitmapFromFile(P6_Image)
 				Goto DrawPie
 				}
@@ -1217,10 +1226,13 @@ PieActivate:
 		RedPie:
 		If PieMode > 1
 			{
-			pBackgroundRight = %A_ScriptDir%\Resources\LabelBG\RMenuRight.png
+			pBackgroundRightU = %A_ScriptDir%\Resources\LabelBG\RMenuRight.png
+			pBackgroundRightD = %A_ScriptDir%\Resources\LabelBG\RMenuRight.png
 			pBackgroundTop = %A_ScriptDir%\Resources\LabelBG\RMenuTop.png
-			pBackgroundLeft = %A_ScriptDir%\Resources\LabelBG\RMenuLeft.png
+			pBackgroundLeftU = %A_ScriptDir%\Resources\LabelBG\RMenuLeft.png
+			pBackgroundLeftD = %A_ScriptDir%\Resources\LabelBG\RMenuLeft.png
 			pBackgroundBottom = %A_ScriptDir%\Resources\LabelBG\RMenuBottom.png
+			
 			If (dist < PieMenuSize)
 				{
 				pBitmap := Gdip_CreateBitmapFromFile(Rnull_Image)
@@ -1228,31 +1240,37 @@ PieActivate:
 				}
 			If angle between 0 and 60
 				{
+				pBackgroundLeftU = %A_ScriptDir%\Resources\LabelBG\RMenuLeftH.png
 				pBitmap := Gdip_CreateBitmapFromFile(R1_Image)
 				Goto DrawPie
 				}
 			If angle between 60 and 120
 				{
+				pBackgroundBottom = %A_ScriptDir%\Resources\LabelBG\RMenuBottomH.png
 				pBitmap := Gdip_CreateBitmapFromFile(R2_Image)
 				Goto DrawPie
 				}
 			If angle between 120 and 180
 				{
+				pBackgroundRightU = %A_ScriptDir%\Resources\LabelBG\RMenuRightH.png
 				pBitmap := Gdip_CreateBitmapFromFile(R3_Image)
 				Goto DrawPie
 				}
 			If angle between 180 and 240
 				{
+				pBackgroundRightD = %A_ScriptDir%\Resources\LabelBG\RMenuRightH.png
 				pBitmap := Gdip_CreateBitmapFromFile(R4_Image)
 				Goto DrawPie
 				}
 			If angle between 240 and 300
 				{
+				pBackgroundTop = %A_ScriptDir%\Resources\LabelBG\RMenuTopH.png
 				pBitmap := Gdip_CreateBitmapFromFile(R5_Image)
 				Goto DrawPie
 				}
 			If angle between 300 and 360
 				{
+				pBackgroundLeftD = %A_ScriptDir%\Resources\LabelBG\RMenuLeftH.png
 				pBitmap := Gdip_CreateBitmapFromFile(R6_Image)
 				Goto DrawPie
 				}
@@ -1270,13 +1288,17 @@ PieActivate:
 			Gdip_DrawImage(G, pBitmap, MXi-65, MYi+47, 130, 20)
 			pBitmap := Gdip_CreateBitmapFromFile(pBackgroundBottom)
 			Gdip_DrawImage(G, pBitmap, MXi-65, MYi-68, 130, 20)
-			pBitmap := Gdip_CreateBitmapFromFile(pBackgroundRight)
+			pBitmap := Gdip_CreateBitmapFromFile(pBackgroundRightD)
 			Gdip_DrawImage(G, pBitmap, MXi-170, MYi+16, 130, 20)
+			pBitmap := Gdip_CreateBitmapFromFile(pBackgroundRightU)
 			Gdip_DrawImage(G, pBitmap, MXi-170, MYi-32, 130, 20)	
-			pBitmap := Gdip_CreateBitmapFromFile(pBackgroundLeft)
+			pBitmap := Gdip_CreateBitmapFromFile(pBackgroundLeftD)
 			Gdip_DrawImage(G, pBitmap, MXi+40, MYi+16, 130, 20)
+			pBitmap := Gdip_CreateBitmapFromFile(pBackgroundLeftU)
 			Gdip_DrawImage(G, pBitmap, MXi+40, MYi-32, 130, 20)
 			Gdip_DisposeImage(pBitmap)
+
+;Boop-boop-boopa-doop
 			
 			If PieMode = 0
 				{
