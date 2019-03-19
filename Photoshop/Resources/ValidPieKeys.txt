@@ -14,7 +14,7 @@ Numpad5
 Numpad6
 Numpad7
 Numpad8
-Numpad9|
+Numpad9
 NumpadDot
 NumpadDiv
 a
@@ -44,7 +44,7 @@ x
 y
 z
 SC033
-SC034|-
+SC034
 =
 Del
 PgDn
@@ -63,3 +63,4 @@ F9
 F10
 F11
 F12
+RButton
